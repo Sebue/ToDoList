@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="pl.edu.us.sebue.todolist.MainActivity">
+    <item
+        android:id="@+id/dropTask"
+        android:orderInCategory="100"
+        android:title="@string/dropTasks"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/dropCompletedTasks"
+        android:orderInCategory="100"
+        android:title="@string/dropCompletedTasks"
+        app:showAsAction="never" />
+</menu>

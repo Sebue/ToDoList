@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ToDoList</string>
+    <string name="dropTasks">Clear tasks</string>
+    <string name="dropCompletedTasks">Remove all completed tasks</string>
+    <string name="dropTasksAlert">Are you sure about removing all task?</string>
+
+
+    <string name="extrasTask">Task</string>
+    <string name="extrasDeleteId">DeleteId</string>
+</resources>
