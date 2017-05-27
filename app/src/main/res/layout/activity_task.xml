@@ -83,21 +83,13 @@
         app:fabSize="normal"
         app:srcCompat="@drawable/ic_add_circle_black_48dp" />
 
-    <Button
-        android:id="@+id/btnDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="showDatePickerDialog"
-        android:text="Set reminder"
-        android:layout_centerVertical="true"
-        android:layout_alignParentStart="true" />
-
     <TextView
         android:id="@+id/dateView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toStartOf="@+id/fabDelete"
-        android:text="Reminder is not set" />
+        android:onClick="showDatePickerDialog"
+        android:text="Click to set reminder" />
 
 </RelativeLayout>

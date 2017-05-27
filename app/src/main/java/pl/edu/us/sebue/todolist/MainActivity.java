@@ -1,5 +1,7 @@
 package pl.edu.us.sebue.todolist;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,10 +19,12 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import pl.edu.us.sebue.todolist.controller.RowAdapter;
+import pl.edu.us.sebue.todolist.model.db.AlarmReminder;
 import pl.edu.us.sebue.todolist.model.db.DataModel;
 import pl.edu.us.sebue.todolist.model.db.DbAdapter;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String DEBUG_TAG = "MAIN_ACTIVITY";
     Context context;
     ListView listView;
     DbAdapter dbAdapter;
@@ -105,29 +110,49 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
+    public void createNotifications(DataModel task) {
+        Intent alarmIntent = new Intent(this, AlarmReminder.class);
+        alarmIntent.putExtra("Title", task.getTitle());
+        alarmIntent.putExtra("Text", "Priority: " + task.getPriority().toString() + ". " + task.getDescription());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, task.getDate().getTime() - (1000 * 60 * 15), pendingIntent);
+    }
+
     @Override
     public void onResume(){
         super.onResume();
         Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            DataModel task = (DataModel) extras.get(String.valueOf(R.string.extrasTask));
-            if(task != null) {
-                if(task.getId() < 0l) {
-                    dbAdapter.insertTask(task);
-                    Toast.makeText(context, "Added task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+        try {
+            if (extras != null && dbAdapter != null) {
+                DataModel task = (DataModel) extras.get(String.valueOf(R.string.extrasTask));
+                if (task != null) {
+                    if (task.getId() < 0l) {
+                        dbAdapter.insertTask(task);
+                        if(task.getDate() != null && !task.isCompleted()) {
+                            createNotifications(task);
+                            Toast.makeText(context, "Notification has been set for task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(context, "Added task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        dbAdapter.updateTask(task);
+                        Toast.makeText(context, "Updated task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    long id = (long) extras.get(String.valueOf(R.string.extrasDeleteId));
+                    dbAdapter.deleteTodo(id);
+                    Toast.makeText(context, "Task is deleted", Toast.LENGTH_SHORT).show();
                 }
-                else{
-                    dbAdapter.updateTask(task);
-                    Toast.makeText(context, "Updated task: " + task.getTitle(), Toast.LENGTH_SHORT).show();
-                }
-            }
-            else{
-                long id = (long) extras.get(String.valueOf(R.string.extrasDeleteId));
-                dbAdapter.deleteTodo(id);
-                Toast.makeText(context, "Task is deleted", Toast.LENGTH_SHORT).show();
             }
         }
-
+        catch(Exception ex){
+            Log.e(DEBUG_TAG, "Error in onResume, message: " + ex.getMessage());
+        }
+        if(getIntent().getExtras() != null){
+            getIntent().getExtras().clear();
+        }
         rowAdapter.refresh(dbAdapter.getAllTodos());
     }
 }

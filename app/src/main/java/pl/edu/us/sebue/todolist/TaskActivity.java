@@ -33,6 +33,7 @@ public class TaskActivity extends AppCompatActivity {
     TextView dateView;
 
     static Date date;
+    boolean isReminderSet;
 
     FloatingActionButton fabDelete;
     FloatingActionButton fabSave;
@@ -41,6 +42,8 @@ public class TaskActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
+        date = new Date();
+        isReminderSet = false;
         priority = (Spinner) findViewById(R.id.prioritySpinner);
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, getPriorityForSpinner());
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -69,6 +72,7 @@ public class TaskActivity extends AppCompatActivity {
                 if(task != null) {
                     intent.putExtra(String.valueOf(R.string.extrasDeleteId), task.getId());
                 }
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
         });
@@ -80,6 +84,7 @@ public class TaskActivity extends AppCompatActivity {
                 if(isMandatoryPopulated()) {
                     Intent intent = new Intent(TaskActivity.this, MainActivity.class);
                     intent.putExtra(String.valueOf(R.string.extrasTask), getPopulatedTask());
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 }
             }
@@ -96,6 +101,9 @@ public class TaskActivity extends AppCompatActivity {
         }
         task.setCompleted(doneCheck.isChecked());
         task.setDescription(descText.getText().toString());
+        if(isReminderSet){
+            task.setDate(date);
+        }
 
         return task;
     }
@@ -117,43 +125,22 @@ public class TaskActivity extends AppCompatActivity {
         return results;
     }
 
-    @Override
-    protected void onPause(){
-        super.onPause();
-        finishActivity(0);
-    }
-
     public void showDatePickerDialog(View v) {
-        date = new Date();
-        DialogFragment newFragment = new DatePickerFragment();
-        newFragment.show(getSupportFragmentManager(), "datePicker");
+        DatePickerDialog newFragment = new DatePickerDialog(this);
+        newFragment.show();
+        newFragment.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                date.setYear(year - 1900);
+                date.setMonth(month);
+                date.setDate(dayOfMonth);
+                isReminderSet = true;
+                dateView.setText("Reminder: " + DateFormat.format("dd/MM/yyyy HH:mm", date));
+            }
+        });
 
-        DialogFragment newFragmentTime = new TimePickerFragment();
-        newFragmentTime.show(getSupportFragmentManager(), "timePicker");
-
-        dateView.setText(date.toString());
-    }
-
-    private static class DatePickerFragment extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener {
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current date as the default date in the picker
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-
-            // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(getActivity(), this, year, month, day);
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            date.setYear(year);
-            date.setMonth(month);
-            date.setDate(day);
-        }
+        TimePickerFragment newFragmentTime = new TimePickerFragment();
+        newFragmentTime.show(getSupportFragmentManager(), "TimePicker");
     }
 
     private static class TimePickerFragment extends DialogFragment
@@ -161,12 +148,10 @@ public class TaskActivity extends AppCompatActivity {
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current time as the default values for the picker
             final Calendar c = Calendar.getInstance();
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int minute = c.get(Calendar.MINUTE);
 
-            // Create a new instance of TimePickerDialog and return it
             return new TimePickerDialog(getActivity(), this, hour, minute,
                     DateFormat.is24HourFormat(getActivity()));
         }
