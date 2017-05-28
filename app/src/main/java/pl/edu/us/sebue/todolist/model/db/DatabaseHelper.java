@@ -17,6 +17,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TITLE_OPTIONS = "TEXT NOT NULL";
     private static final String IS_COMPLETED_OPTIONS = "INTEGER NOT NULL";
     private static final String TEXT_OPTIONAL_OPTIONS = "TEXT";
+    private static final String BLOB_OPTIONS = "BLOB";
 
     private static final String DB_CREATE_TODO_TABLE =
             "CREATE TABLE " + DB_TODO_TABLE + "( "

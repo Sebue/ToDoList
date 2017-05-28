@@ -9,6 +9,7 @@ import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class DbAdapter {
         newTaskValues.put(DataModel.TITLE, task.getTitle());
         newTaskValues.put(DataModel.PRIORITY, String.valueOf(task.getPriority()));
         newTaskValues.put(DataModel.IS_COMPLETED, task.isCompleted());
-        newTaskValues.put(DataModel.DATE, String.valueOf(task.getDate()));
+        newTaskValues.put(DataModel.DATE, String.valueOf(android.text.format.DateFormat.format("dd/MM/yyyy HH:mm", task.getDate())));
         newTaskValues.put(DataModel.REFERENCE, task.getReference());
         newTaskValues.put(DataModel.DESCRIPTION, task.getDescription());
 
@@ -70,7 +71,7 @@ public class DbAdapter {
         updateTaskValues.put(DataModel.TITLE, task.getTitle());
         updateTaskValues.put(DataModel.PRIORITY, String.valueOf(task.getPriority()));
         updateTaskValues.put(DataModel.IS_COMPLETED, task.isCompleted());
-        updateTaskValues.put(DataModel.DATE, String.valueOf(task.getDate()));
+        updateTaskValues.put(DataModel.DATE, String.valueOf(android.text.format.DateFormat.format("dd/MM/yyyy HH:mm", task.getDate())));
         updateTaskValues.put(DataModel.REFERENCE, task.getReference());
         updateTaskValues.put(DataModel.DESCRIPTION, task.getDescription());
 
@@ -87,9 +88,14 @@ public class DbAdapter {
         return db.delete(DB_TODO_TABLE, where, null) > 0;
     }
 
+
     public List<DataModel> getAllTodos() {
+        return getAllTodos(DataModel.ID);
+    }
+
+    public List<DataModel> getAllTodos(String column) {
         String[] columns = {DataModel.ID, DataModel.TITLE, DataModel.PRIORITY, DataModel.IS_COMPLETED, DataModel.REFERENCE, DataModel.DESCRIPTION, DataModel.DATE};
-        Cursor cursor = db.query(DB_TODO_TABLE, columns, null, null, null, null, null);
+        Cursor cursor = db.query(DB_TODO_TABLE, columns, null, null, null, null, column);
         List<DataModel> tasks = new ArrayList<>();
         if(cursor != null && cursor.moveToFirst()){
             do{
@@ -110,8 +116,9 @@ public class DbAdapter {
         task.setReference(cursor.getBlob(4));
         task.setDescription(cursor.getString(5));
         DateFormat format = DateFormat.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         try {
-            task.setDate(format.parse(cursor.getString(6)));
+            task.setDate(sdf.parse(cursor.getString(6)));
         } catch (ParseException e) {
             e.printStackTrace();
         }

@@ -18,6 +18,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import pl.edu.us.sebue.todolist.controller.RowAdapter;
 import pl.edu.us.sebue.todolist.model.db.AlarmReminder;
 import pl.edu.us.sebue.todolist.model.db.DataModel;
@@ -59,12 +62,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, TaskActivity.class);
                 startActivity(intent);
-                //TODO add new task
-//                DataModel data = new DataModel("Yolo", DataModel.Priority.None);
-//                data.setCompleted(true);
-//                long tro = dbAdapter.insertTask(data);
-//                Toast.makeText(context, "Title: " + dbAdapter.getTodo(tro).getTitle(), Toast.LENGTH_SHORT).show();
-//                rowAdapter.refresh(dbAdapter.getAllTodos());
             }
         });
     }
@@ -87,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
             dbAdapter.deleteAllDoneTasks();
             rowAdapter.refresh(dbAdapter.getAllTodos());
             Toast.makeText(context, "Removed all done tasks", Toast.LENGTH_SHORT).show();
+            return true;
+        }else if (id == R.id.sortBtn) {
+            sortItems();
             return true;
         }
 
@@ -154,5 +154,43 @@ public class MainActivity extends AppCompatActivity {
             getIntent().getExtras().clear();
         }
         rowAdapter.refresh(dbAdapter.getAllTodos());
+    }
+
+    public void sortItems(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        final String [] sortType = {"Title", "Priority", "Date", "Status"};
+        builder.setTitle("Choose sort type");
+        final List<Integer> selectedId = new ArrayList<>();
+        selectedId.add(0);
+        builder.setSingleChoiceItems(sortType, 0,
+                new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        selectedId.clear();
+                        selectedId.add(id);
+                    }
+                });
+        builder.setPositiveButton("Ascending", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                setSortItemOnListView(sortType[selectedId.get(0)]);
+            }
+        });
+        builder.setNegativeButton("Descending", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                setSortItemOnListView(sortType[selectedId.get(0)] + " desc");
+            }
+        });
+
+        builder.create();
+        builder.show();
+    }
+
+    private void setSortItemOnListView(String column){
+        if(column.contains("Status")){
+            column = column.replace("Status", DataModel.IS_COMPLETED);
+        }
+        rowAdapter.refresh(dbAdapter.getAllTodos(column));
     }
 }

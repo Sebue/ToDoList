@@ -45,6 +45,7 @@
                 android:layout_toEndOf="@+id/reference"
                 android:ems="10"
                 android:hint="Title"
+                android:maxLength="16"
                 android:inputType="textCapSentences|textAutoComplete|textPersonName"
                 android:textColor="@color/colorText" />
 
@@ -52,10 +53,10 @@
                 android:id="@+id/doneCheckBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/description"
-                android:layout_marginTop="15dp"
                 android:textColor="@color/colorText"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:layout_alignBottom="@+id/textView"
+                android:layout_toEndOf="@+id/reference" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabDelete"
@@ -87,9 +88,18 @@
         android:id="@+id/dateView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toStartOf="@+id/fabDelete"
         android:onClick="showDatePickerDialog"
-        android:text="Click to set reminder" />
+        android:text="Click to set reminder"
+        android:layout_alignTop="@+id/prioritySpinner"
+        android:layout_toEndOf="@+id/reference" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Is done:"
+        android:layout_below="@+id/description"
+        android:layout_alignStart="@+id/fabSave"
+        android:layout_marginTop="29dp" />
 
 </RelativeLayout>

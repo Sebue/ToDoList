@@ -65,11 +65,14 @@ public class RowAdapter extends ArrayAdapter<DataModel> {
                 row.setBackgroundColor(context.getColor(R.color.colorPrimaryDark));
                 break;
             case None:
+                row.setBackgroundColor(context.getColor(R.color.colorBackground));
                 holder.priority.setText("");
                 break;
         }
         if(object.isCompleted()) {
             holder.isFinished.setImageDrawable(context.getDrawable(R.drawable.ic_done_black_256dp_1x));
+        } else {
+            holder.isFinished.setImageDrawable(null);
         }
         return row;
     }

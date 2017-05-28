@@ -3,13 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="pl.edu.us.sebue.todolist.MainActivity">
     <item
-        android:id="@+id/dropTask"
+        android:id="@+id/sortBtn"
         android:orderInCategory="100"
+        android:title="Item"
+        android:icon="@drawable/ic_swap_vert_white_48dp"
+        android:visible="true"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/dropTask"
+        android:orderInCategory="101"
         android:title="@string/dropTasks"
         app:showAsAction="never" />
     <item
         android:id="@+id/dropCompletedTasks"
-        android:orderInCategory="100"
+        android:orderInCategory="101"
         android:title="@string/dropCompletedTasks"
         app:showAsAction="never" />
 </menu>
